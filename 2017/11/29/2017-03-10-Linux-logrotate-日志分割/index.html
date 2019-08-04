@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>Linux logrotate 日志分割</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    Linux logrotate 日志分割
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:32.280Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>Rails在默认情况下会将系统日志全部写在一个文件里，这样当服务器跑的时间比较久之后，日志文件就会变得比较大，而且出了错误，也不方便排查。</p>
+<p>logrotate就是管理这些日志文件的神器，可以对单个日志文件或者某个目录下的文件按时间/大小进行切割，压缩操作；指定日志保存数量；还可以在切割之后运行自定义命令。</p>
+<h5 id="logrotate-分割日志原理"><a href="#logrotate-分割日志原理" class="headerlink" title="logrotate 分割日志原理"></a>logrotate 分割日志原理</h5><p>系统会按照计划的频率运行logrotate，logrotate需要的cron任务应该在安装时就自动创建了。可以使用以下命令查看</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/cron.daily/logrotate</span><br></pre></td></tr></table></figure>
+
+<h5 id="logrotate-conf-主配置文件"><a href="#logrotate-conf-主配置文件" class="headerlink" title="logrotate.conf 主配置文件"></a>logrotate.conf 主配置文件</h5><p>logrotate的主要配置文件位于 /etc/logrotate.conf ，在这个文件中有一行需要特别注意一下, 这个目录就是各软件使用logrotate分割日志文件所使用的配置文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">include /etc/logrotate.d</span><br></pre></td></tr></table></figure>
+
+<h5 id="logrotate-d-配置文件目录"><a href="#logrotate-d-配置文件目录" class="headerlink" title="logrotate.d 配置文件目录"></a>logrotate.d 配置文件目录</h5><p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">drwxr-xr-x  2 root root 4096 Mar 10 09:52 ./</span><br><span class="line">drwxr-xr-x 96 root root 4096 Jan 21 11:02 ../</span><br><span class="line">-rw-r--r--  1 root root  174 Mar 10 09:52 724activity</span><br><span class="line">-rw-r--r--  1 root root  173 Apr 10  2014 apt</span><br><span class="line">-rw-r--r--  1 root root   79 Feb 18  2014 aptitude</span><br><span class="line">-rw-r--r--  1 root root  232 Mar  7  2014 dpkg</span><br><span class="line">-rw-r--r--  1 root root  847 Oct 25 04:08 mysql-server</span><br><span class="line">-rw-r--r--  1 root root   94 Jan 23  2013 ppp</span><br><span class="line">-rw-r--r--  1 root root  126 Jan 15  2014 redis-server</span><br><span class="line">-rw-r--r--  1 root root  515 Dec  4  2013 rsyslog</span><br><span class="line">-rw-r--r--  1 root root  178 Mar  1  2014 ufw</span><br><span class="line">-rw-r--r--  1 root root  122 Apr 12  2014 upstart</span><br></pre></td></tr></table></figure>
+
+<h5 id="配置自定义需要切割的文件"><a href="#配置自定义需要切割的文件" class="headerlink" title="配置自定义需要切割的文件"></a>配置自定义需要切割的文件</h5><p>直接去 /etc/logrotate.d 下随便复制一个文件，改名，然后直接进去看一下当中的英文，改一下内容即可</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/var/www/ruby-china/current/<span class="built_in">log</span>/*.<span class="built_in">log</span> &#123;</span><br><span class="line">  daily</span><br><span class="line">  missingok</span><br><span class="line">  rotate 7</span><br><span class="line">  compress</span><br><span class="line">  dateext</span><br><span class="line">  delaycompress</span><br><span class="line">  lastaction</span><br><span class="line">    pid=/data/www/ruby-china/current/tmp/pids/unicorn.pid</span><br><span class="line">    sudo <span class="built_in">test</span> -s <span class="variable">$pid</span> &amp;&amp; sudo <span class="built_in">kill</span> -USR1 <span class="string">"<span class="variable">$(cat $pid)</span>"</span></span><br><span class="line">  endscript</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>设定好之后，可以等明天，或是执行<br><code>logrotate -f /etc/logrotate.conf</code> 看看。</p>
+<h5 id="logrotate-参数说明"><a href="#logrotate-参数说明" class="headerlink" title="logrotate 参数说明"></a>logrotate 参数说明</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. daily 表示每天整理，也可以改成 weekly 或 monthly</span><br><span class="line">2. dateext 表示檔案補上 rotate 的日期</span><br><span class="line">3. missingok 表示如果找不到 log 檔也沒關係</span><br><span class="line">4. rotate 7 表示保留7份</span><br><span class="line">5. compress 表示壓縮起來，預設用 gzip。不過如果硬碟空間多，不壓也沒關係。</span><br><span class="line">6. delaycompress 表示延後壓縮直到下一次 rotate</span><br><span class="line">7. notifempty 表示如果 log 檔是空的，就不 rotate</span><br><span class="line">8. copytruncate 先複製 log 檔的內容後，在清空的作法，因為有些程式一定 log 在本來的檔名，例如 rails。另一種方法是 create。</span><br></pre></td></tr></table></figure>
+
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

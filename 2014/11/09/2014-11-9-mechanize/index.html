@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>ruby Mechanize</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    ruby Mechanize
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2014-11-09T04:55:11.000Z" itemprop="datePublished">2014-11-09</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:24.173Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>今天看到豆瓣妹子这个网站的妹子图不错，又不想一个一个收藏，于是就想着写一个简单的爬虫，将这些美女图全部爬下来.<br>首先在本地安装 mechanize</p>
+<pre><code>gem install mechanize</code></pre><p>然后直接上代码：</p>
+<pre><code># encoding: utf-8
+require &apos;mechanize&apos;
+class Douban
+  def initialize
+    @agent = Mechanize.new
+    @page = @agent.get(&apos;http://www.doubanmeizi.com&apos;)
+  end
+
+  # loop the paginate
+  def loop_page(page = @page)
+    snatch_images(page)
+    next_page_link = page.links.find{|link| link.text.eql?(&quot;下一页&quot;)}
+    page = next_page_link.nil? ? nil : (@agent.click next_page_link)
+    loop_page(page) unless page.nil?
+  end
+
+  # click all the detail href and snatch the origin picture
+  def snatch_images(page)
+    puts &quot;start save image....&quot;
+    Dir.chdir(&quot;./image&quot;) do |path|
+      page.search(&apos;a.imageLink&apos;).each do |link|
+        new_page = @agent.click link
+        new_page.search(&quot;img.alignnone&quot;).each do |image|
+          image_url = image.attr(&quot;src&quot;)
+          puts image_url
+          @agent.get(image_url) do |image|
+            image.save
+          end
+        end
+      end
+    end
+  end
+
+  def start
+    loop_page()
+  end
+end
+
+doubanmeizi = Douban.new
+doubanmeizi.start()</code></pre><p>更多mechanize文档请点击这： <a href="http://docs.seattlerb.org/mechanize" target="_blank" rel="noopener">http://docs.seattlerb.org/mechanize</a></p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

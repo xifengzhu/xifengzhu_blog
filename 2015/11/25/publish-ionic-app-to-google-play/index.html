@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>Publish ionic app to google play</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    Publish ionic app to google play
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2015-11-25T15:11:13.000Z" itemprop="datePublished">2015-11-25</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:26.781Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>Publish ionic app to google play</p>
+<h2 id="1-Remove-the-develop-the-plugins"><a href="#1-Remove-the-develop-the-plugins" class="headerlink" title="1. Remove the develop the plugins"></a>1. Remove the develop the plugins</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cordova plugin rm cordova-plugin-<span class="built_in">console</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="2-Renerate-our-private-key-using-the-keytool"><a href="#2-Renerate-our-private-key-using-the-keytool" class="headerlink" title="2. Renerate our private key using the keytool"></a>2. Renerate our private key using the keytool</h2><p>  use keytool  to generate the .keystore file for signature:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keytool -genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-Edit-project-properties-file"><a href="#3-Edit-project-properties-file" class="headerlink" title="3. Edit project.properties file"></a>3. Edit project.properties file</h2><ul>
+<li>Open /platforms/android/local.properties (or project.properties)</li>
+<li>add follow code</li>
+</ul>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">key.alias=myapp</span><br><span class="line">key.store=myapp.keystore</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-Build-the-apk-file"><a href="#4-Build-the-apk-file" class="headerlink" title="4. Build the apk file"></a>4. Build the apk file</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cordova build android --release</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-Signs-the-apk"><a href="#5-Signs-the-apk" class="headerlink" title="5. Signs the apk"></a>5. Signs the apk</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore myapp.keystore myApp.apk myapp</span><br></pre></td></tr></table></figure>
+
+<p>you can verify that it has been signed by run:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jarsigner -verify -verbose -certs myApp.apk</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-Optimize-apk-by-Zipalign"><a href="#6-Optimize-apk-by-Zipalign" class="headerlink" title="6. Optimize apk by Zipalign"></a>6. Optimize apk by Zipalign</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zipalign -v 4 source.apk destination.apk</span><br></pre></td></tr></table></figure>
+
+<p>you can verify that it has been signed by run:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zipalign -c -v 4 application.apk</span><br></pre></td></tr></table></figure>
+
+<h2 id="7-refs"><a href="#7-refs" class="headerlink" title="7. refs"></a>7. refs</h2><ul>
+<li><a href="http://ionicframework.com/docs/guide/publishing.html" target="_blank" rel="noopener">http://ionicframework.com/docs/guide/publishing.html</a></li>
+<li><a href="https://iphonedevlog.wordpress.com/2014/10/29/signing-an-android-apk-apart-from-eclipse-in-mac-os-x/" target="_blank" rel="noopener">https://iphonedevlog.wordpress.com/2014/10/29/signing-an-android-apk-apart-from-eclipse-in-mac-os-x/</a></li>
+<li><a href="http://blog.csdn.net/zhixiang2010/article/details/17463095" target="_blank" rel="noopener">http://blog.csdn.net/zhixiang2010/article/details/17463095</a></li>
+</ul>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

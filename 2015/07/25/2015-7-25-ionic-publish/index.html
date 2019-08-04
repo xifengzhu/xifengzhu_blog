@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>ionic publish to fir.im</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    ionic publish to fir.im
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2015-07-25T02:29:11.000Z" itemprop="datePublished">2015-07-25</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:25.240Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>Publish the ionic app to fir.im</p>
+<h3 id="prepare-ios-develop-requirement"><a href="#prepare-ios-develop-requirement" class="headerlink" title="prepare ios develop requirement"></a>prepare ios develop requirement</h3><p>prepare for iOS develop environment in <a href="https://developer.apple.com" target="_blank" rel="noopener">https://developer.apple.com</a></p>
+<pre><code>1. create App Id
+2. create Apn 证书
+3. create Provisioning Profile 证书</code></pre><p>reference tutorial: <a href="http://blog.csdn.net/holydancer/article/details/9219333/" target="_blank" rel="noopener">http://blog.csdn.net/holydancer/article/details/9219333/</a></p>
+<h3 id="build-app-in-ionic"><a href="#build-app-in-ionic" class="headerlink" title="build app in ionic"></a>build app in ionic</h3><p>build android apk and $projectname.xcodeproj</p>
+<h6 id="for-android"><a href="#for-android" class="headerlink" title="for android"></a>for android</h6><pre><code>1. ionic platform add andorid
+2. ionic build android</code></pre><h6 id="for-ios"><a href="#for-ios" class="headerlink" title="for ios"></a>for ios</h6><pre><code>1. ionic platform add ios
+2. ionic platform add ios</code></pre><h3 id="publish-to-firm-im"><a href="#publish-to-firm-im" class="headerlink" title="publish to firm.im"></a>publish to firm.im</h3><p>share the app url make more people can see it.</p>
+<h6 id="for-android-1"><a href="#for-android-1" class="headerlink" title="for android"></a>for android</h6><pre><code>1. get anroid apk file in $projectname/platforms/android/build/outputs/apk/anroid-debug.apk
+2. upload the apk to http://firm.im</code></pre><h6 id="for-ios-1"><a href="#for-ios-1" class="headerlink" title="for ios"></a>for ios</h6><pre><code>1. open the $prodjectname.xcodeproj wiht xcode
+2. connect your device and build a app in prodcut menu
+3. archive the project and generate the $prodjectname.xcarchive folder
+4. export the $prodjectname.xcarchive to a .ipa file
+5. upload the $prodjectname.ipa file to http://firm.im</code></pre><p>reference tutorial:  <a href="http://virteom.com/how-to-create-an-ipa-file-using-xcode" target="_blank" rel="noopener">http://virteom.com/how-to-create-an-ipa-file-using-xcode</a></p>
+<p>pure command line tutorial: <a href="http://www.thecave.com/2014/09/16/using-xcodebuild-to-export-a-ipa-from-an-archive/" target="_blank" rel="noopener">http://www.thecave.com/2014/09/16/using-xcodebuild-to-export-a-ipa-from-an-archive/</a></p>
+<h3 id="more-references"><a href="#more-references" class="headerlink" title="more references:"></a>more references:</h3><p><a href="http://stackoverflow.com/questions/25901269/xcode-attempted-to-locate-or-generate-matching-signing-assets-and-failed-to-do-s" target="_blank" rel="noopener">http://stackoverflow.com/questions/25901269/xcode-attempted-to-locate-or-generate-matching-signing-assets-and-failed-to-do-s</a></p>
+<p><a href="http://www.thecave.com/2014/09/16/using-xcodebuild-to-export-a-ipa-from-an-archive/" target="_blank" rel="noopener">http://www.thecave.com/2014/09/16/using-xcodebuild-to-export-a-ipa-from-an-archive/</a></p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

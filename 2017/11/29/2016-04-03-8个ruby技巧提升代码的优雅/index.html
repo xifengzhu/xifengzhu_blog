@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>8个ruby技巧提升代码的优雅</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    8个ruby技巧提升代码的优雅
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:28.792Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>8个ruby技巧提升代码的优雅</p>
+<h4 id="1-Build-Hash"><a href="#1-Build-Hash" class="headerlink" title="1.Build Hash"></a>1.Build Hash</h4><p>你可以用一个列表一系列的值构造 Hash 通过 Hash[…] 方法，它将会像下面的方式创建一个 Hash：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Hash[<span class="string">'key1'</span>, <span class="string">'value1'</span>, <span class="string">'key2'</span>, <span class="string">'value2'</span>]</span><br><span class="line"><span class="comment"># =&gt; &#123;"key1" =&gt; "value1", "key2" =&gt; "value"&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2"><a href="#2" class="headerlink" title="2. **"></a>2. **</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_method</span><span class="params">(a, *b, **c)</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>a 是一个常规的参数，b 将会得到第一个参数后面的所有参数并把他们放入一个数组中， **c 将会得到传人方法的任何格式为 key: value 的参数。<br>来看看下面的例子： 一个参数</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_method(<span class="number">1</span>)</span><br><span class="line"><span class="comment"># =&gt; [1, [], &#123;&#125;]</span></span><br></pre></td></tr></table></figure>
+
+<p>超过一个参数 + hash-style 参数</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">my_method(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="symbol">a:</span> <span class="number">1</span>, <span class="symbol">b:</span> <span class="number">2</span>)</span><br><span class="line"><span class="comment"># =&gt; [1, [2, 3, 4], &#123;:a =&gt; 1, :b =&gt; 2&#125;]</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-Add-uniq-value-to-array"><a href="#3-Add-uniq-value-to-array" class="headerlink" title="3. Add uniq value to array"></a>3. Add uniq value to array</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">array = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">array <span class="params">|= [2, 4]</span></span><br><span class="line"><span class="params">p array</span></span><br><span class="line"><span class="params"># =&gt; [1, 2, 3, 4]</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="4-Cycle-generate-data"><a href="#4-Cycle-generate-data" class="headerlink" title="4. Cycle generate data"></a>4. Cycle generate data</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ring = <span class="string">%w[one two three]</span>.cycle</span><br><span class="line"></span><br><span class="line">p ring.take(<span class="number">5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Result:</span></span><br><span class="line"><span class="comment"># ["one", "two", "three", "one", "two"]</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="5-Quick-mass-assignments"><a href="#5-Quick-mass-assignments" class="headerlink" title="5.Quick mass assignments"></a>5.Quick mass assignments</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a, b, c, d = <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_method</span><span class="params">(*args)</span></span></span><br><span class="line">  a, b, c, d = args</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="6-Rescue-to-the-rescue"><a href="#6-Rescue-to-the-rescue" class="headerlink" title="6.Rescue to the rescue"></a>6.Rescue to the rescue</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">h = &#123; <span class="symbol">:age</span> =&gt; <span class="number">10</span> &#125;</span><br><span class="line">h[<span class="symbol">:name</span>].downcase                         <span class="comment"># ERROR</span></span><br><span class="line">h[<span class="symbol">:name</span>].downcase <span class="keyword">rescue</span> <span class="string">"No name"</span>        <span class="comment"># =&gt; "No name"</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="7-Allow-both-single-items-AND-arrays-to-be-enumerated-against"><a href="#7-Allow-both-single-items-AND-arrays-to-be-enumerated-against" class="headerlink" title="7. Allow both single items AND arrays to be enumerated against"></a>7. Allow both single items AND arrays to be enumerated against</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># [*items] converts a single object into an array with that single object</span></span><br><span class="line"><span class="comment"># of converts an array back into, well, an array again</span></span><br><span class="line">[*items].each <span class="keyword">do</span> <span class="params">|item|</span></span><br><span class="line">  <span class="comment"># ...</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">obj  = <span class="number">1</span></span><br><span class="line">[*obj].each&#123; <span class="params">|s|</span> s&#125;  =&gt; [<span class="number">1</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-Create-a-hash-from-an-array-with-Hash-arr"><a href="#7-Create-a-hash-from-an-array-with-Hash-arr" class="headerlink" title="7.Create a hash from an array with Hash[*arr]"></a>7.Create a hash from an array with Hash[*arr]</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">arr = [:a, 1, :b, 2]</span><br><span class="line">Hash[*arr]</span><br><span class="line"># =&gt; &#123;:a =&gt; 1, :b =&gt; 2&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="8-here-doc"><a href="#8-here-doc" class="headerlink" title="8.here doc"></a>8.here doc</h4><p>here 文档有一个缺点就是它会影响代码流畅和缩进问题，由于 HERE 会缩进两格，但有时为了最后内容连续性，你可能会把每行内容都靠左写，像这样：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_method</span></span></span><br><span class="line"><span class="string">&lt;&lt;-HERE</span></span><br><span class="line"><span class="string">Ruby</span></span><br><span class="line">stricks</span><br><span class="line">Interesting</span><br><span class="line">Right</span><br><span class="line">HERE</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>这有一个技巧可以避免它，通过用 gsub 方法加一个正则表达式。你可以自动的去除前面的空格，这样你就能保持缩进。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_method</span></span></span><br><span class="line">  &lt;&lt;-HERE.gsub(<span class="regexp">/^\s+/</span>, <span class="string">''</span>)</span><br><span class="line">    Ruby</span><br><span class="line">    stricks</span><br><span class="line">    Interesting</span><br><span class="line">    Right</span><br><span class="line">  HERE</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

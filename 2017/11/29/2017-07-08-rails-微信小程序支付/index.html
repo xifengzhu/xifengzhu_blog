@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>Rails 微信小程序支付</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    Rails 微信小程序支付
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:34.769Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>Rails 微信小程序支付</p>
+<h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><ol>
+<li><p>在公众平台注册一个小程序账号 <a href="https://mp.weixin.qq.com/cgi-bin/registermidpage?action=index&lang=zh_CN" target="_blank" rel="noopener">点击入口</a><br><img src="/xifengzhu_blog//assets/images/%E5%BE%AE%E4%BF%A1%E5%85%AC%E4%BC%97%E5%B9%B3%E5%8F%B0.png" alt="微信公众平台.png"></p>
+</li>
+<li><p>申请微信支付<br><img src="/xifengzhu_blog//assets/images/%E7%94%B3%E8%AF%B7%E6%94%AF%E4%BB%98.jpg" alt="申请支付.jpg"></p>
+</li>
+<li><p>配置商户信息<br>申请微信支付成功后，登陆商户平台(pay.weixin.qq.com)进入账户中心，设置微信商户的API Key与下载证书</p>
+</li>
+<li><p>配置Https服务器<br>可以参考：<a href="http://xifengzhu.github.io/xifengzhu_blog/%E9%83%A8%E7%BD%B2/2017/05/09/%E4%BD%BF%E7%94%A8-Let-s-Encrypt-%E5%8A%A0%E5%AF%86(HTTPS)%E4%BD%A0%E7%9A%84%E7%BD%91%E7%AB%99.html" target="_blank" rel="noopener">使用 Let’s Encrypt 加密(HTTPS)你的网站</a></p>
+</li>
+</ol>
+<h3 id="Rails-服务端"><a href="#Rails-服务端" class="headerlink" title="Rails 服务端"></a>Rails 服务端</h3><h4 id="Installation-gem"><a href="#Installation-gem" class="headerlink" title="Installation gem"></a>Installation gem</h4><p>Add this line to your Gemfile:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem <span class="string">'wx_pay'</span></span><br></pre></td></tr></table></figure>
+
+<p>And then execute:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bundle install</span><br></pre></td></tr></table></figure>
+
+<h4 id="Config"><a href="#Config" class="headerlink" title="Config"></a>Config</h4><p>Create config/initializers/wx_pay.rb and put following configurations into it.</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># required</span></span><br><span class="line">WxPay.appid = <span class="string">'YOUR_APPID'</span></span><br><span class="line">WxPay.key = <span class="string">'YOUR_KEY'</span></span><br><span class="line">WxPay.mch_id = <span class="string">'YOUR_MCH_ID'</span></span><br><span class="line">WxPay.debug_mode = <span class="literal">true</span> <span class="comment"># default is `true`</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># cert, see https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=4_3</span></span><br><span class="line"><span class="comment"># using PCKS12</span></span><br><span class="line">WxPay.set_apiclient_by_pkcs12(File.read(pkcs12_filepath), pass)</span><br><span class="line"></span><br><span class="line"><span class="comment"># if you want to use `generate_authorize_req` and `authenticate`</span></span><br><span class="line">WxPay.appsecret = <span class="string">'YOUR_SECRET'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># optional - configurations for RestClient timeout, etc.</span></span><br><span class="line">WxPay.extra_rest_client_options = &#123;<span class="symbol">timeout:</span> <span class="number">2</span>, <span class="symbol">open_timeout:</span> <span class="number">3</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Request-payment-for-miniapp"><a href="#Request-payment-for-miniapp" class="headerlink" title="Request payment for miniapp"></a>Request payment for miniapp</h3><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># =&gt; &#123;</span></span><br><span class="line"><span class="comment">#    :appId=&gt;"wx6743cf23566a7991",</span></span><br><span class="line"><span class="comment">#    :package=&gt;"prepay_id=wx20170703182440e40cd68a2e0757840067",</span></span><br><span class="line"><span class="comment">#    :nonceStr=&gt;"dpKt531nHFruKbfu",</span></span><br><span class="line"><span class="comment">#    :timeStamp=&gt;"1499077480",</span></span><br><span class="line"><span class="comment">#    :signType=&gt;"MD5",</span></span><br><span class="line"><span class="comment">#    :paySign=&gt;"183385DC3B435FF2164FB0C445DAACCD"</span></span><br><span class="line"><span class="comment">#  &#125;</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">request_payment</span></span></span><br><span class="line">  unifiedorder = WxPay::Service.invoke_unifiedorder unifiedorder_params</span><br><span class="line">  js_payment_params = &#123;</span><br><span class="line">    <span class="symbol">prepayid:</span> unifiedorder[<span class="symbol">:raw</span>][<span class="string">"xml"</span>][<span class="string">"prepay_id"</span>],</span><br><span class="line">    <span class="symbol">noncestr:</span> unifiedorder[<span class="symbol">:raw</span>][<span class="string">"xml"</span>][<span class="string">"nonce_str"</span>]</span><br><span class="line">  &#125;</span><br><span class="line">  result = WxPay::Service.generate_js_pay_req js_payment_params</span><br><span class="line">  result</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># official document for detailed request params and return fields</span></span><br><span class="line"><span class="comment"># https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=9_1</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">unifiedorder_params</span></span></span><br><span class="line">  &#123;</span><br><span class="line">    <span class="symbol">body:</span> <span class="string">'商品订单支付'</span>,</span><br><span class="line">    <span class="symbol">out_trade_no:</span> <span class="string">'test003'</span>,</span><br><span class="line">    <span class="symbol">total_fee:</span> <span class="number">1</span>,</span><br><span class="line">    <span class="symbol">spbill_create_ip:</span> <span class="string">'127.0.0.1'</span>,</span><br><span class="line">    <span class="symbol">notify_url:</span> <span class="string">'https://youdomain/notify'</span>,</span><br><span class="line">    <span class="symbol">trade_type:</span> <span class="string">'JSAPI'</span>,</span><br><span class="line">    <span class="symbol">openid:</span> <span class="string">'OPENID'</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Wechat-nimiapp"><a href="#Wechat-nimiapp" class="headerlink" title="Wechat nimiapp"></a>Wechat nimiapp</h3><p>调用服务端的接口获取到必要的参数</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  :package=&gt;<span class="string">"prepay_id=wx20170703182440e40cd68a2e0757840067"</span>,</span><br><span class="line">  :nonceStr=&gt;<span class="string">"dpKt531nHFruKbfu"</span>,</span><br><span class="line">  :timeStamp=&gt;<span class="string">"1499077480"</span>,</span><br><span class="line">  :signType=&gt;<span class="string">"MD5"</span>,</span><br><span class="line">  :paySign=&gt;<span class="string">"183385DC3B435FF2164FB0C445DAACCD"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将上述服务端返回对应到小程序的参数中去:</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">wx.requestPayment(&#123;</span><br><span class="line">  <span class="string">'timeStamp'</span>: <span class="string">'1499077480'</span>,</span><br><span class="line">  <span class="string">'nonceStr'</span>: <span class="string">'dpKt531nHFruKbfu'</span>,</span><br><span class="line">  <span class="string">'package'</span>: <span class="string">'prepay_id=wx20170703182440e40cd68a2e0757840067'</span>,</span><br><span class="line">  <span class="string">'signType'</span>: <span class="string">'MD5'</span>,</span><br><span class="line">  <span class="string">'paySign'</span>: <span class="string">'183385DC3B435FF2164FB0C445DAACCD'</span>,</span><br><span class="line">  <span class="string">'success'</span>: <span class="function"><span class="keyword">function</span> <span class="title">success</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">    wx.showToast(&#123;</span><br><span class="line">      title: <span class="string">'支付成功'</span>,</span><br><span class="line">      icon: <span class="string">'success'</span>,</span><br><span class="line">      duration: <span class="number">2000</span></span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">'fail'</span>: <span class="function"><span class="keyword">function</span> <span class="title">fail</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"支付失败"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

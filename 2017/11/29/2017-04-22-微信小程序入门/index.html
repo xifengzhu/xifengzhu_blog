@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>10分钟入门微信小程序开发</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    10分钟入门微信小程序开发
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:32.781Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>10分钟入门微信小程序开发</p>
+<h4 id="小程序开发工具"><a href="#小程序开发工具" class="headerlink" title="小程序开发工具"></a>小程序开发工具</h4><p>微信web开发这工具页面</p>
+<p><img src="/xifengzhu_blog//assets/images/dev-tool.png" alt="develop-tool.png">{:width=”800px”}</p>
+<h4 id="小程序项目结构"><a href="#小程序项目结构" class="headerlink" title="小程序项目结构"></a>小程序项目结构</h4><p>每个小程序的结构都是由两个主要部分构成：主体部分 + 各个页面</p>
+<h5 id="主体部分主要由3个文件构成"><a href="#主体部分主要由3个文件构成" class="headerlink" title="主体部分主要由3个文件构成"></a>主体部分主要由3个文件构成</h5><ul>
+<li>app.js：小程序逻辑，初始化APP</li>
+<li>app.json ：小程序配置，比如导航、窗口、页面http请求跳转等</li>
+<li>app.wxss：公共样式配置</li>
+</ul>
+<h5 id="页面由4个文件构成"><a href="#页面由4个文件构成" class="headerlink" title="页面由4个文件构成"></a>页面由4个文件构成</h5><ul>
+<li>js：页面逻辑</li>
+<li>wxml：页面展示</li>
+<li>wxss：页面样式表</li>
+<li>json：页面配置，配置一些页面展示的数据</li>
+</ul>
+<p><img src="/xifengzhu_blog//assets/images/file-structure.png" alt="小程序结构.png"></p>
+<h5 id="App-生命周期"><a href="#App-生命周期" class="headerlink" title="App 生命周期"></a>App 生命周期</h5><p>App() 函数用来注册一个小程序。接受一个 object 参数，其指定小程序的生命周期函数等。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">App(&#123;</span><br><span class="line">  onLaunch: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">//App Launch ,生命周期函数--监听小程序初始化</span></span><br><span class="line">    <span class="comment">// 当小程序初始化完成时，会触发 onLaunch（全局只触发一次）</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onShow: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// onShow,生命周期函数--监听小程序显示</span></span><br><span class="line">    <span class="comment">// 当小程序启动，或从后台进入前台显示，会触发 onShow</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onHide: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// onHide,生命周期函数--监听小程序隐藏</span></span><br><span class="line">    <span class="comment">// 当小程序从前台进入后台，会触发 onHide</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h5 id="Page-生命周期"><a href="#Page-生命周期" class="headerlink" title="Page 生命周期"></a>Page 生命周期</h5><h6 id="Page-生命周期函数"><a href="#Page-生命周期函数" class="headerlink" title="Page 生命周期函数"></a>Page 生命周期函数</h6><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">Page(&#123;</span><br><span class="line">  data:&#123;</span><br><span class="line">    <span class="comment">//页面的初始数据</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onLoad:<span class="function"><span class="keyword">function</span>(<span class="params">options</span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 生命周期函数--监听页面加载</span></span><br><span class="line">    <span class="comment">// 页面初始化 options为页面跳转所带来的参数</span></span><br><span class="line">    <span class="comment">// 一个页面只会调用一次。</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onReady:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 生命周期函数--监听页面初次渲染完成</span></span><br><span class="line">    <span class="comment">// 页面渲染完成</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onShow:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 生命周期函数--监听页面显示</span></span><br><span class="line">    <span class="comment">// 页面显示,每次打开页面都会调用一次。</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onHide:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 生命周期函数--监听页面隐藏</span></span><br><span class="line">    <span class="comment">// 页面隐藏,当navigateTo或底部tab切换时调用。</span></span><br><span class="line">  &#125;,</span><br><span class="line">  onUnload:<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    <span class="comment">// 生命周期函数--监听页面卸载</span></span><br><span class="line">    <span class="comment">// 页面关闭,当redirectTo或navigateBack的时候调用。</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h6 id="Page-实例的生命周期"><a href="#Page-实例的生命周期" class="headerlink" title="Page 实例的生命周期"></a>Page 实例的生命周期</h6><p><img src="/xifengzhu_blog//assets/images/page-circle.png" alt="mina-lifecycle.png"></p>
+<h5 id="开发中常见的需求场景"><a href="#开发中常见的需求场景" class="headerlink" title="开发中常见的需求场景"></a>开发中常见的需求场景</h5><ul>
+<li><p>页面跳转</p>
+<ul>
+<li>wx.redirectTo</li>
+<li>wx.navigateTo</li>
+<li>wx.switchTab</li>
+<li>wx.reLaunch</li>
+<li>wx.navigateBack</li>
+</ul>
+</li>
+<li><p>网络请求(wx.request)</p>
+</li>
+<li><p>数据存储</p>
+<ul>
+<li>wx.setStorage/wx.getStorage</li>
+<li>wx.setStorageSync/wx.setStorageSync</li>
+<li>wx.removeStorage/wx.removeStorageSync</li>
+</ul>
+</li>
+<li><p>绑定事件（bindtap）</p>
+</li>
+</ul>
+<h5 id="更多资料"><a href="#更多资料" class="headerlink" title="更多资料"></a>更多资料</h5><ul>
+<li><a href="https://mp.weixin.qq.com/debug/wxadoc/dev/framework/MINA.html" target="_blank" rel="noopener">https://mp.weixin.qq.com/debug/wxadoc/dev/framework/MINA.html</a></li>
+</ul>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

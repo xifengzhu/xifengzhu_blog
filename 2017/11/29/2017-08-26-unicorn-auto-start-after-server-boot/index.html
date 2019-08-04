@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>Unicorn auto start after server boot</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    Unicorn auto start after server boot
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:35.294Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <h3 id="Running-Unicorn-as-a-Service"><a href="#Running-Unicorn-as-a-Service" class="headerlink" title="Running Unicorn as a Service"></a>Running Unicorn as a Service</h3><p>Add ${project_name}_unicorn file with follow command:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/init.d/$&#123;project_name&#125;_unicorn</span><br></pre></td></tr></table></figure>
+
+<p>paste follow text:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/sh</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> File: /etc/init.d/<span class="variable">$&#123;project_name&#125;</span>_unicorn</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## BEGIN INIT INFO</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Provides:          unicorn</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Required-Start:    <span class="variable">$local_fs</span> <span class="variable">$remote_fs</span> <span class="variable">$network</span> <span class="variable">$syslog</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Required-Stop:     <span class="variable">$local_fs</span> <span class="variable">$remote_fs</span> <span class="variable">$network</span> <span class="variable">$syslog</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Default-Start:     2 3 4 5</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Default-Stop:      0 1 6</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Short-Description: starts the unicorn web server</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Description:       starts unicorn</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## END INIT INFO</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Feel free to change any of the following variables <span class="keyword">for</span> your app:</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> ubuntu is the default user on Amazon<span class="string">'s EC2 Ubuntu instances.</span></span></span><br><span class="line">USER=deployer</span><br><span class="line"><span class="meta">#</span><span class="bash"> Replace [PATH_TO_RAILS_ROOT_FOLDER] with your application<span class="string">'s path. I prefer</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> /srv/app-name to /var/www. The /srv folder is specified as the server<span class="string">'s</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="string">"service data"</span> folder, <span class="built_in">where</span> services are located. The /var directory,</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> however, is dedicated to variable data that changes rapidly, such as logs.</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Reference https://help.ubuntu.com/community/LinuxFilesystemTreeOverview <span class="keyword">for</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> more information.</span></span><br><span class="line">APP_ROOT="/var/www/$&#123;project_name&#125;/current"</span><br><span class="line"><span class="meta">#</span><span class="bash"> Set the environment. This can be changed to staging or development <span class="keyword">for</span> staging</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> servers.</span></span><br><span class="line">RAILS_ENV=production</span><br><span class="line"><span class="meta">#</span><span class="bash"> This should match the pid setting <span class="keyword">in</span> <span class="variable">$APP_ROOT</span>/config/unicorn.rb.</span></span><br><span class="line">PID=$APP_ROOT/tmp/pids/unicorn.pid</span><br><span class="line"><span class="meta">#</span><span class="bash"> A simple description <span class="keyword">for</span> service output.</span></span><br><span class="line">DESC="Unicorn app - $RAILS_ENV"</span><br><span class="line"><span class="meta">#</span><span class="bash"> If you<span class="string">'re using rbenv, you may need to use the following setup to get things</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Unicorn can be run using `bundle <span class="built_in">exec</span> unicorn` or `bin/unicorn`.</span></span><br><span class="line">UNICORN="bin/bundle exec unicorn"</span><br><span class="line"><span class="meta">#</span><span class="bash"> Execute the unicorn executable as a daemon, with the appropriate configuration</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> and <span class="keyword">in</span> the appropriate environment.</span></span><br><span class="line">UNICORN_OPTS="-c $APP_ROOT/config/unicorn/$RAILS_ENV.rb -E $RAILS_ENV -D"</span><br><span class="line">CMD="cd $APP_ROOT &amp;&amp; $UNICORN $UNICORN_OPTS"</span><br><span class="line"><span class="meta">#</span><span class="bash"> Give your upgrade action a timeout of 60 seconds.</span></span><br><span class="line">TIMEOUT=60</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Store the action that we should take from the service <span class="built_in">command</span><span class="string">'s first</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> argument (e.g. start, stop, upgrade).</span></span><br><span class="line">action="$1"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Make sure the script exits <span class="keyword">if</span> any variables are <span class="built_in">unset</span>. This is short <span class="keyword">for</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">set</span> -o nounset.</span></span><br><span class="line">set -u</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Set the location of the old pid. The old pid is the process that is getting</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> replaced.</span></span><br><span class="line">old_pid="$PID.oldbin"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Make sure the APP_ROOT is actually a folder that exists. An error message from</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> the <span class="built_in">cd</span> <span class="built_in">command</span> will be displayed <span class="keyword">if</span> it fails.</span></span><br><span class="line">cd $APP_ROOT || exit 1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> A <span class="keyword">function</span> to send a signal to the current unicorn master process.</span></span><br><span class="line">sig () &#123;</span><br><span class="line">  test -s "$PID" &amp;&amp; kill -$1 `cat $PID`</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Send a signal to the old process.</span></span><br><span class="line">oldsig () &#123;</span><br><span class="line">  test -s $old_pid &amp;&amp; kill -$1 `cat $old_pid`</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> A switch <span class="keyword">for</span> handling the possible actions to take on the unicorn process.</span></span><br><span class="line">case $action in</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Start the process by testing <span class="keyword">if</span> it<span class="string">'s there (sig 0), failing if it is,</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> otherwise running the <span class="built_in">command</span> as specified above.</span></span><br><span class="line">  start)</span><br><span class="line">    sig 0 &amp;&amp; echo &gt;&amp;2 "$DESC is already running" &amp;&amp; exit 0</span><br><span class="line">    su - $USER -c "$CMD"</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Graceful shutdown. Send QUIT signal to the process. Requests will be</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> completed before the processes are terminated.</span></span><br><span class="line">  stop)</span><br><span class="line">    sig QUIT &amp;&amp; echo "Stopping $DESC" exit 0</span><br><span class="line">    echo &gt;&amp;2 "Not running"</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Quick shutdown - kills all workers immediately.</span></span><br><span class="line">  force-stop)</span><br><span class="line">    sig TERM &amp;&amp; echo "Force-stopping $DESC" &amp;&amp; exit 0</span><br><span class="line">    echo &gt;&amp;2 "Not running"</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Graceful shutdown and <span class="keyword">then</span> start.</span></span><br><span class="line">  restart)</span><br><span class="line">    sig QUIT &amp;&amp; echo "Restarting $DESC" &amp;&amp; sleep 2 \</span><br><span class="line">      &amp;&amp; su - $USER -c "$CMD" &amp;&amp; exit 0</span><br><span class="line">    echo &gt;&amp;2 "Couldn't restart."</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Reloads config file (unicorn.rb) and gracefully restarts all workers. This</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">command</span> won<span class="string">'t pick up application code changes if you have `preload_app</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="literal">true</span>` <span class="keyword">in</span> your unicorn.rb config file.</span></span><br><span class="line">  reload)</span><br><span class="line">    sig HUP &amp;&amp; echo "Reloading configuration for $DESC" &amp;&amp; exit 0</span><br><span class="line">    echo &gt;&amp;2 "Couldn't reload configuration."</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Re-execute the running binary, <span class="keyword">then</span> gracefully shutdown old process. This</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="built_in">command</span> allows you to have zero-downtime deployments. The application may</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> spin <span class="keyword">for</span> a minute, but at least the user doesn<span class="string">'t get a 500 error page or</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> the like. Unicorn interprets the USR2 signal as a request to start a new</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> master process and phase out the old worker processes. If the upgrade fails</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> <span class="keyword">for</span> some reason, a new process is started.</span></span><br><span class="line">  upgrade)</span><br><span class="line">    if sig USR2 &amp;&amp; echo "Upgrading $DESC" &amp;&amp; sleep 10 \</span><br><span class="line">      &amp;&amp; sig 0 &amp;&amp; oldsig QUIT</span><br><span class="line">    then</span><br><span class="line">      n=$TIMEOUT</span><br><span class="line">      while test -s $old_pid &amp;&amp; test $n -ge 0</span><br><span class="line">      do</span><br><span class="line">        printf '.' &amp;&amp; sleep 1 &amp;&amp; n=$(( $n - 1 ))</span><br><span class="line">      done</span><br><span class="line">      echo</span><br><span class="line"></span><br><span class="line">      if test $n -lt 0 &amp;&amp; test -s $old_pid</span><br><span class="line">      then</span><br><span class="line">        echo &gt;&amp;2 "$old_pid still exists after $TIMEOUT seconds"</span><br><span class="line">        exit 1</span><br><span class="line">      fi</span><br><span class="line">      exit 0</span><br><span class="line">    fi</span><br><span class="line">    echo &gt;&amp;2 "Couldn't upgrade, starting 'su - $USER -c \"$CMD\"' instead"</span><br><span class="line">    su - $USER -c "$CMD"</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> A basic status checker. Just checks <span class="keyword">if</span> the master process is responding to</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> the `<span class="built_in">kill</span>` <span class="built_in">command</span>.</span></span><br><span class="line">  status)</span><br><span class="line">    sig 0 &amp;&amp; echo &gt;&amp;2 "$DESC is running." &amp;&amp; exit 0</span><br><span class="line">    echo &gt;&amp;2 "$DESC is not running."</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Reopen all logs owned by the master and all workers.</span></span><br><span class="line">  reopen-logs)</span><br><span class="line">    sig USR1</span><br><span class="line">    ;;</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Any other action gets the usage message.</span></span><br><span class="line">  *)</span><br><span class="line">    # Usage</span><br><span class="line">    echo &gt;&amp;2 "Usage: $0 &lt;start|stop|restart|reload|upgrade|force-stop|reopen-logs&gt;"</span><br><span class="line">    exit 1</span><br><span class="line">    ;;</span><br><span class="line">esac</span><br></pre></td></tr></table></figure>
+
+<h3 id="Make-sure-your-init-script-has-permission-to-be-executed"><a href="#Make-sure-your-init-script-has-permission-to-be-executed" class="headerlink" title="Make sure your init script has permission to be executed"></a>Make sure your init script has permission to be executed</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod +x /etc/init.d/$&#123;project_name&#125;_unicorn</span><br></pre></td></tr></table></figure>
+
+<p>Now, you can run sudo service unicorn start to start your unicorn process</p>
+<h3 id="Add-your-script-to-the-default-runlevels"><a href="#Add-your-script-to-the-default-runlevels" class="headerlink" title="Add your script to the default runlevels"></a>Add your script to the default runlevels</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo update-rc.d $&#123;project_name&#125;_unicorn defaults</span><br></pre></td></tr></table></figure>
+
+<p>So that your script will be executed by every reboot.</p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

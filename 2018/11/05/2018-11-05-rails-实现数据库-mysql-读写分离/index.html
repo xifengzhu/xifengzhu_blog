@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>Rails 实现数据库（Mysql）读写分离</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    Rails 实现数据库（Mysql）读写分离
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2018-11-04T16:00:00.000Z" itemprop="datePublished">2018-11-05</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:37.874Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>读写分离是指通过一个读写分离地址实现读写请求的自动转发。基本的原理是让主数据库处理事务性增、改、删操作（INSERT、UPDATE、DELETE），而从数据库处理SELECT查询操作。数据库复制被用来把事务性操作导致的变更同步到集群中的从数据库。使用读写分离最大的作用无非是缓解服务器压力。</p>
+<p>常见的实现读写分离的方式有如下两种</p>
+<ul>
+<li>基于第三方中间件实现，比较成熟的有 <code>Mysql</code> 官方提供的 <a href="https://dev.mysql.com/downloads/router/" target="_blank" rel="noopener">MySQL Router</a> 以及 360公司基于 <code>MySQL-Proxy 0.8.2</code> 开发的开源 <a href="https://github.com/Qihoo360/Atlas" target="_blank" rel="noopener">Atlas</a> 等</li>
+</ul>
+<p><img src="/images/mysql-proxy.png" alt="mysql proxy"></p>
+<ul>
+<li>基于应用层实现， 如使用 <code>gem</code> <a href="https://github.com/thiagopradi/octopus" target="_blank" rel="noopener">octopus</a></li>
+</ul>
+<p><img src="/images/mysql-app.png" alt="mysql app"></p>
+<p>本次实践的是用基于应用的方式来实现读写分离。</p>
+<p>为了实践读写分离，将 <code>MySQL</code> 分别安装在了本地 <code>Mac</code> 和阿里云 <code>Ubuntu</code> 系统上，<code>Mac</code> 的 <code>MySQL</code> 作为写入数据库，而 <code>Ubuntu</code> 的作为读取数据库。</p>
+<h2 id="配置-MySQL-主从复制"><a href="#配置-MySQL-主从复制" class="headerlink" title="配置 MySQL 主从复制"></a>配置 MySQL 主从复制</h2><h3 id="创建账号"><a href="#创建账号" class="headerlink" title="创建账号"></a>创建账号</h3><p>在 <code>Master</code> 的数据库中建立一个备份帐户：每个 <code>slave</code> 使用标准的 <code>MySQL</code> 用户名和密码连接 <code>master</code>。进行复制操作的用户会授予 <code>REPLICATION SLAVE</code> 权限. 命令如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mysql &gt; GRANT REPLICATION SLAVE ON *.* TO <span class="string">'backup'</span>@<span class="string">'113.66.254.238'</span> IDENTIFIED BY <span class="string">'12345678'</span>;</span><br><span class="line">mysql &gt; flush privileges;</span><br></pre></td></tr></table></figure>
+
+<p>命令是建立一个帐户 <code>backup</code>，并且只能允许从 <code>113.66.254.238</code> 这个地址上来登陆，密码是 <code>12345678</code>。</p>
+<h3 id="配置-master"><a href="#配置-master" class="headerlink" title="配置 master"></a>配置 master</h3><p>修改主服务器 <code>Master</code>的 <code>MySQL</code> 配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ vi /etc/my.cnf（默认）</span><br><span class="line">[mysqld]</span><br><span class="line"><span class="built_in">log</span>-bin=mysql-bin     //[必须]启用二进制日志</span><br><span class="line">server-id=112         //[必须]服务器唯一ID，默认是1，一般取IP最后一段</span><br><span class="line"><span class="comment"># 指定同步的数据库， 如果 不指定则同步全部数据库</span></span><br><span class="line">binlog-do-db= eshop_development</span><br></pre></td></tr></table></figure>
+
+<p>重启 <code>master</code> <code>service mysqld restart</code>，运行 <code>SHOW MASTER STATUS</code>，输出如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">+------------------+----------+-------------------+------------------+-------------------+</span><br><span class="line">| File             | Position | Binlog_Do_DB      | Binlog_Ignore_DB | Executed_Gtid_Set |</span><br><span class="line">+------------------+----------+-------------------+------------------+-------------------+</span><br><span class="line">| mysql-bin.000004 |     308  | eshop_development | mysql            |                   |</span><br><span class="line">+------------------+----------+-------------------+------------------+-------------------+</span><br></pre></td></tr></table></figure>
+
+<p>注：执行完此步骤后不要再操作主服务器 <code>MYSQL</code>，防止主服务器状态值变化</p>
+<h3 id="配置slave"><a href="#配置slave" class="headerlink" title="配置slave"></a>配置slave</h3><p>修改从服务器 <code>slave</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ vi /etc/my.cnf</span><br><span class="line">[mysqld]</span><br><span class="line">server-id=238      //[必须]服务器唯一ID，默认是1，一般取IP最后一段</span><br></pre></td></tr></table></figure>
+
+<p>配置从服务器 <code>Slave</code>， 设置需要链接主服务器的地址与登录用户名跟密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; change master to master_dhost=<span class="string">'47.106.177.112'</span>,master_user=<span class="string">'backup'</span>,master_password=<span class="string">'12345678'</span>,</span><br><span class="line">master_log_file=<span class="string">'mysql-bin.000004'</span>,master_log_pos=308;</span><br><span class="line">mysql&gt; start slave;    //启动从服务器复制功能</span><br></pre></td></tr></table></figure>
+
+<p>检查从服务器(Slave)复制功能状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">*************************** 1. row ***************************</span><br><span class="line">               Slave_IO_State: Waiting for master to send event</span><br><span class="line">                  Master_Host: 47.106.177.112</span><br><span class="line">                  Master_User: backup</span><br><span class="line">                  Master_Port: 3306</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000012</span><br><span class="line">          Read_Master_Log_Pos: 2258</span><br><span class="line">               Relay_Log_File: edu-mysql-relay-bin.000014</span><br><span class="line">                Relay_Log_Pos: 2424</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000012</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: Yes</span><br><span class="line">              Replicate_Do_DB:</span><br><span class="line">          Replicate_Ignore_DB:</span><br><span class="line">           Replicate_Do_Table:</span><br><span class="line">       Replicate_Ignore_Table:</span><br><span class="line">      Replicate_Wild_Do_Table:</span><br><span class="line">  Replicate_Wild_Ignore_Table:</span><br><span class="line">                   Last_Errno: 0</span><br><span class="line">                   Last_Error:</span><br><span class="line">                 Skip_Counter: 0</span><br><span class="line">          Exec_Master_Log_Pos: 2258</span><br><span class="line">              Relay_Log_Space: 2848</span><br><span class="line">              Until_Condition: None</span><br><span class="line">               Until_Log_File:</span><br><span class="line">                Until_Log_Pos: 0</span><br><span class="line">           Master_SSL_Allowed: No</span><br><span class="line">           Master_SSL_CA_File:</span><br><span class="line">           Master_SSL_CA_Path:</span><br><span class="line">              Master_SSL_Cert:</span><br><span class="line">            Master_SSL_Cipher:</span><br><span class="line">               Master_SSL_Key:</span><br><span class="line">        Seconds_Behind_Master: 0</span><br><span class="line">Master_SSL_Verify_Server_Cert: No</span><br><span class="line">                Last_IO_Errno: 0</span><br><span class="line">                Last_IO_Error:</span><br><span class="line">               Last_SQL_Errno: 0</span><br><span class="line">               Last_SQL_Error:</span><br><span class="line">  Replicate_Ignore_Server_Ids:</span><br><span class="line">             Master_Server_Id: 1</span><br><span class="line">                  Master_UUID: c908538b-db65-11e8-8419-00163e1037ab</span><br><span class="line">             Master_Info_File: /usr/local/var/mysql/master.info</span><br><span class="line">                    SQL_Delay: 0</span><br><span class="line">          SQL_Remaining_Delay: NULL</span><br><span class="line">      Slave_SQL_Running_State: Slave has read all relay log; waiting for more updates</span><br><span class="line">           Master_Retry_Count: 86400</span><br><span class="line">                ......</span><br></pre></td></tr></table></figure>
+
+<p><code>Slave_IO</code> 及 <code>Slave_SQL</code> 进程必须正常运行，即 <code>YES</code> 状态，否则都是错误的状态(如：其中一个 <code>NO</code> 均属错误)。</p>
+<h2 id="Rails-应用配置"><a href="#Rails-应用配置" class="headerlink" title="Rails 应用配置"></a>Rails 应用配置</h2><h3 id="添加如下一行到-Gemfile"><a href="#添加如下一行到-Gemfile" class="headerlink" title="添加如下一行到 Gemfile"></a>添加如下一行到 Gemfile</h3><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gem <span class="string">'ar-octopus'</span></span><br></pre></td></tr></table></figure>
+
+<p>执行 <code>bundle install</code></p>
+<h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p>在 <code>Rails</code> 项目的 <code>config</code> 目录下新建文件 <code>shards.xml</code>,该文件用于保 <code>存Linux</code> 下 <code>MySQL read</code> 数据库, 该文件长成这个样子：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">octopus:</span></span><br><span class="line"><span class="attr">  replicated:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">  environments:</span></span><br><span class="line"><span class="bullet">    -</span> <span class="string">development</span></span><br><span class="line"></span><br><span class="line"><span class="attr">  development:</span></span><br><span class="line"><span class="attr">    slave1:</span></span><br><span class="line"><span class="attr">      host:</span> <span class="number">113.66</span><span class="number">.254</span><span class="number">.238</span></span><br><span class="line"><span class="attr">      port:</span> <span class="number">3306</span></span><br><span class="line"><span class="attr">      adapter:</span> <span class="string">mysql2</span></span><br><span class="line"><span class="attr">      database:</span> <span class="string">eshop_development</span></span><br><span class="line"><span class="attr">      usename:</span> <span class="string">root</span></span><br><span class="line"><span class="attr">      password:</span> <span class="string">root</span></span><br></pre></td></tr></table></figure>
+
+<p><code>rails</code> 会将 <code>database.yml</code> 中配置的数据库作为写数据库(master)。</p>
+<p>测试下是否如预期的从主库写入数据，从库读取数据, 在 <code>rails console</code>中执行如下</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">2.3.1 :001 &gt;</span> AdminUser.create(<span class="symbol">email:</span> <span class="string">"xifengzhu520@gmail.com"</span>)</span><br><span class="line"><span class="meta">2.3.1 :002 &gt;</span> AdminUser.find_by_email(<span class="string">"xifengzhu520@gmail.com"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>结果输出为:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="symbol">Shard:</span> slave1]  AdminUser Load (<span class="number">27.4</span>ms)  SELECT  <span class="string">`admin_users`</span>.* FROM <span class="string">`admin_users`</span> WHERE <span class="string">`admin_users`</span>.<span class="string">`email`</span> = <span class="string">'xifengzhu520@gmail.com'</span> LIMIT <span class="number">1</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到数据已经写入主数据库，并且能从从库中读取出来，说明此时读写分离已经配置成功。</p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

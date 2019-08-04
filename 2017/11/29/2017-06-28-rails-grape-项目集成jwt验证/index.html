@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="keywords" content="hexo,个人博客,blog">
+  <meta name="description" content="夕枫主的个人博客">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <link rel="dns-prefetch" href="https://busuanzi.ibruce.info">
+  <link rel="dns-prefetch" href="https://at.alicdn.com">
+  
+  <link rel="dns-prefetch" href="https://hm.baidu.com/">
+  
+  <link rel="stylesheet" type="text/css" href="/./style/main.css">
+	<link rel="shortcut icon" href="/favicon.ico" title="Favicon">
+	<title>Rails grape 项目集成JWT验证</title>
+  
+  <script>var _hmt=_hmt||[];(function(){var hm=document.createElement("script");hm.src="https://hm.baidu.com/hm.js?13ace7420ed32982b3d47c6bb20e6f0e";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();
+  </script>
+  
+</head>
+<body>
+  <canvas id="pattern-placeholder" height="230"></canvas>
+<div class="navbar-header">
+  <a class="blog-title" href="/">夕枫主‘s Blog</a>
+  <a class="face-img" href="/">
+    <img src="https://s.gravatar.com/avatar/78f2986278ac96cbd773a91a7599604a?s=150">
+  </a>
+</div>
+<main>
+  <div class="article-title">
+    
+  
+  <h1 class="title">
+    Rails grape 项目集成JWT验证
+  </h1>
+  
+
+
+    <ul class="article-info">
+      <li>
+        发布
+        <time datetime="2017-11-29T06:23:25.000Z" itemprop="datePublished">2017-11-29</time>
+      </li>
+      <li>
+        
+    更新 <time datetime="2019-08-04T03:40:34.274Z" itemprop="dateUpdated">2019-08-04</time>
+
+      </li>
+      <li id="busuanzi_container_page_pv">
+        阅读 <span id="busuanzi_value_page_pv"></span>
+      </li>
+    </ul>
+  </div>
+  <div class="container">
+    <div class="article">
+      <div class="content">
+        
+        <h2 id="JWT简介"><a href="#JWT简介" class="headerlink" title="JWT简介"></a>JWT简介</h2><p>官方描述：</p>
+<blockquote>
+<p>JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.<br>JWT.IO allows you to decode, verify and generate JWT.</p>
+</blockquote>
+<p>我们来看看 <code>jwt</code> 生成的东西</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">aaaaa.bbbbbbb.ccccccc</span><br></pre></td></tr></table></figure>
+
+<p>第一部分是 <code>header</code>， 第二个部分是 <code>payload</code>， 第三部分是 <code>signature</code></p>
+<h4 id="Header-部分"><a href="#Header-部分" class="headerlink" title="Header 部分"></a>Header 部分</h4><p><code>header</code> 部分解密之后为两部分，例如:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"typ"</span>: <span class="string">"JWT"</span>,</span><br><span class="line">  <span class="attr">"alg"</span>: <span class="string">"HS256"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Payload部分"><a href="#Payload部分" class="headerlink" title="Payload部分"></a>Payload部分</h4><p><code>payload</code> 部分为 <code>JWT</code> 声明。 声明有三种类型 - 私人，公开和注册</p>
+<ul>
+<li><p>注册声明是其名称被保留但不是强制性使用的索赔。 例如 - iss，sub，aud等</p>
+</li>
+<li><p>私人声明是双方同意的名称，可能与其他公开声明相冲突。 必须谨慎使用。</p>
+</li>
+<li><p>公开声明 - 根据我们的认证要求（如用户名，用户信息等）可以创建的声明。</p>
+</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"iss"</span>: <span class="string">"sitepoint.com"</span>,</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"Devdatta Kane"</span>,</span><br><span class="line">  <span class="attr">"admin"</span>: <span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个被 <code>encode</code> 之后就变成一串 <code>hash</code>，成为<code>jwt token</code>第二部分</p>
+<h4 id="Signature-部分"><a href="#Signature-部分" class="headerlink" title="Signature 部分"></a>Signature 部分</h4><p><code>Signature</code> 也可能是最重要的部分, 它是由 <code>Header</code>，<code>Payload</code>和 <code>Secret</code> 生成的一串 <code>hash</code>。我们通过具有 <code>secret</code> 的 <code>HMACSHA256</code> 功能作为服务器端密码运行头部和有效负载的组合字符串。 像这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">require &quot;openssl&quot;</span><br><span class="line">require &quot;base64&quot;</span><br><span class="line"></span><br><span class="line">var encodedString = Base64.encode64(header) + &quot;.&quot; + Base64.encode64(payload);</span><br><span class="line">hash  = OpenSSL::HMAC.digest(&quot;sha256&quot;, &quot;secret&quot;, encodedString)</span><br></pre></td></tr></table></figure>
+
+<p>由于只有服务器知道这个 <code>secret</code> ，所以没有人可以篡改 <code>payload</code>，并且服务器可以使用 <code>signature</code> 来检测任何篡改。</p>
+<h2 id="JWT-in-Rails-with-Grape"><a href="#JWT-in-Rails-with-Grape" class="headerlink" title="JWT in Rails with Grape"></a>JWT in Rails with Grape</h2><h4 id="1-首先添加-gem-39-jwt-39-到-Gemfile-然后-bundle-install"><a href="#1-首先添加-gem-39-jwt-39-到-Gemfile-然后-bundle-install" class="headerlink" title="1. 首先添加 gem &#39;jwt&#39; 到 Gemfile, 然后 bundle install"></a>1. 首先添加 <code>gem &#39;jwt&#39;</code> 到 <code>Gemfile</code>, 然后 <code>bundle install</code></h4><h4 id="2-然后在-lib-json-web-token-rb-中创建一个名为-JsonWebToken-的类。-该类将封装JWT令牌的编码和解码逻辑。-像这样："><a href="#2-然后在-lib-json-web-token-rb-中创建一个名为-JsonWebToken-的类。-该类将封装JWT令牌的编码和解码逻辑。-像这样：" class="headerlink" title="2. 然后在 lib / json_web_token.rb 中创建一个名为 JsonWebToken 的类。 该类将封装JWT令牌的编码和解码逻辑。 像这样："></a>2. 然后在 <code>lib / json_web_token.rb</code> 中创建一个名为 <code>JsonWebToken</code> 的类。 该类将封装JWT令牌的编码和解码逻辑。 像这样：</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">require</span> <span class="string">'jwt'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">JsonWebToken</span></span></span><br><span class="line">  <span class="comment"># Encodes and signs JWT Payload with expiration</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">encode</span><span class="params">(payload)</span></span></span><br><span class="line">    payload.reverse_merge!(meta)</span><br><span class="line">    JWT.encode(payload, Rails.application.secrets.secret_key_base)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Decodes the JWT with the signed secret</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">decode</span><span class="params">(token)</span></span></span><br><span class="line">    JWT.decode(token, Rails.application.secrets.secret_key_base)</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Validates the payload hash for expiration and meta claims</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">valid_payload</span><span class="params">(payload)</span></span></span><br><span class="line">    <span class="keyword">if</span> expired(payload) <span class="params">||</span> payload[<span class="string">'client'</span>] != meta[<span class="symbol">:client</span>]</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Default options to be encoded in the token</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">meta</span></span></span><br><span class="line">    &#123;</span><br><span class="line">      <span class="symbol">expired_at:</span> <span class="number">7</span>.days.from_now.to_i,</span><br><span class="line">      <span class="symbol">client:</span> <span class="string">'wechat_app'</span>,</span><br><span class="line">    &#125;</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Validates if the token is expired by exp parameter</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">self</span>.<span class="title">expired</span><span class="params">(payload)</span></span></span><br><span class="line">    Time.at(payload[<span class="string">'expired_at'</span>]) &lt; Time.now</span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3-为-grape-添加一个-helper-方法，如下："><a href="#3-为-grape-添加一个-helper-方法，如下：" class="headerlink" title="3. 为 grape 添加一个 helper 方法，如下："></a>3. 为 <code>grape</code> 添加一个 <code>helper</code> 方法，如下：</h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">module</span> <span class="title">Helpers</span></span></span><br><span class="line">  <span class="class"><span class="keyword">module</span> <span class="title">AuthenticationHelper</span></span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Returns 401 response. To handle malformed / invalid requests.</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">unauthenticated!</span></span></span><br><span class="line">      error! <span class="string">'401 Unauthorized'</span>, <span class="number">401</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Validates the token and user and sets the <span class="doctag">@current</span>_user scope</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">authenticate!</span></span></span><br><span class="line">      <span class="keyword">if</span> !payload <span class="params">||</span> !JsonWebToken.valid_payload(payload.first)</span><br><span class="line">        <span class="keyword">return</span> unauthenticated!</span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">      unauthenticated! <span class="keyword">unless</span> current_user</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    private</span><br><span class="line">    <span class="comment"># Deconstructs the Authorization header and decodes the JWT token.</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">payload</span></span></span><br><span class="line">      token = request.headers[<span class="string">'Authorization'</span>]</span><br><span class="line">      JsonWebToken.decode(token)</span><br><span class="line">    <span class="keyword">rescue</span></span><br><span class="line">      <span class="literal">nil</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># Sets the <span class="doctag">@current</span>_user with the access_token from payload</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">current_user</span></span></span><br><span class="line">      <span class="keyword">if</span> payload[<span class="number">0</span>] &amp;&amp; payload[<span class="number">0</span>][<span class="string">'user_id'</span>]</span><br><span class="line">        @current_user <span class="params">||</span>= User.find_by_wechat_open_id(payload[<span class="number">0</span>][<span class="string">'user_id'</span>])</span><br><span class="line">      <span class="keyword">else</span></span><br><span class="line">        <span class="literal">nil</span></span><br><span class="line">      <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="4-在用户登录的时候-调用JWT生成一个access-token-以后每次调用API加上Header-Authorization-access-token"><a href="#4-在用户登录的时候-调用JWT生成一个access-token-以后每次调用API加上Header-Authorization-access-token" class="headerlink" title="4. 在用户登录的时候 调用JWT生成一个access_token, 以后每次调用API加上Header Authorization ${access_token}"></a>4. 在用户登录的时候 调用JWT生成一个<code>access_token</code>, 以后每次调用API加上Header <code>Authorization ${access_token}</code></h4><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">user = User.find_by(<span class="symbol">email:</span> params[<span class="symbol">:email</span>])</span><br><span class="line"><span class="keyword">if</span> user &amp;&amp; user.valid_password?(params[<span class="symbol">:password</span>])</span><br><span class="line">  &#123; <span class="symbol">access_token:</span> JsonWebToken.encode(&#123;<span class="symbol">user_id:</span> user.id&#125;) &#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="5-在需要验证用户的API-中-helpers-Helpers-AuthenticationHelper-并且在调用逻辑代码之前-执行-authenticate-就行了。"><a href="#5-在需要验证用户的API-中-helpers-Helpers-AuthenticationHelper-并且在调用逻辑代码之前-执行-authenticate-就行了。" class="headerlink" title="5. 在需要验证用户的API 中 helpers ::Helpers::AuthenticationHelper 并且在调用逻辑代码之前 执行 authenticate!就行了。"></a>5. 在需要验证用户的<code>API</code> 中 <code>helpers ::Helpers::AuthenticationHelper</code> 并且在调用逻辑代码之前 执行 <code>authenticate!</code>就行了。</h4>
+      </div>
+        <div class="support-author">
+          <p>感谢您的阅读。 🙏
+            <!--<a class="btn-pay" href="#pay-modal">¥ 打赏支持</a> -->
+          </p>
+        </div>
+        <!--
+            <div class="like ">
+              <div class="like-button">
+                <a id="like-note" href="">
+                  <i class="icon-heart"></i>喜欢
+                </a>
+              </div>
+              <span id="likes-count">256</span>
+            </div>
+        -->
+        <div class="otherLink">
+          <div class="previous">
+          </div>
+          <div class="next">
+          </div>
+        </div>
+        <div class="comments" id="comments">
+          <script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'xifengzhu'; // required: replace example with your forum shortname
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function() {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+<div class="container">
+  <div id="disqus_thread"></div>
+<div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+</div></main>
+<div class="footer">
+  <div class="info">
+    <p>
+    <a href="https://hexo.io"> Hexo </a> 强力驱动 |
+      <a href="https://github.com/Youthink/hexo-themes-yearn"> Yearn </a>
+      主题
+    </p>
+    <p>&copy; </p>
+  </div>
+</div>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<script>//console
+  var consoleConfig = ''.split(',');
+  var canConsole = false;
+  var consoleInfo = (function(consoleConfig) {
+  if (!canConsole || !consoleConfig || consoleConfig.length < 1) {
+    return;
+  }
+  var consoleColor = '#6190e8';
+  var _console;
+  var backgroundTextStyle = 'padding: 1px 5px;color: #fff;background: ' + consoleColor + ';'
+  var textStyle = 'color: ' + consoleColor + ';';
+
+  consoleConfig.map(o => {
+    var num = (o.match(/%c/g) || []).length;
+    if(/^http(s)?:\/\//.test(o)) {
+      console.log('%c     ', 'background: url(' + o + ') no-repeat left center;font-size: 180px;');
+      return;
+    }
+    if (num > 0) {
+      var logArguments = [];
+      for (var i = 0; i < num; i++) {
+        if (i % 2 === 0) {
+          logArguments.push(backgroundTextStyle);
+        } else {
+          logArguments.push(textStyle);
+        }
+      }
+      (_console = console).log.apply(_console, ['%c' + o, textStyle].concat(logArguments));
+      return;
+    }
+    console.log('%c' + o, textStyle);
+  });
+}(consoleConfig));</script><script type="text/javascript" src="/./js/main.js"></script>
+
+  <script src="//at.alicdn.com/t/font_159214_mvtxvg9me9.js"></script>
+</body>
+</html>
+
+
