@@ -41,11 +41,11 @@
     <ul class="article-info">
       <li>
         发布
-        <time datetime="2019-08-01T08:41:10.000Z" itemprop="datePublished">2019-08-01</time>
+        <time datetime="2019-03-04T08:41:10.000Z" itemprop="datePublished">2019-03-04</time>
       </li>
       <li>
         
-    更新 <time datetime="2019-08-04T04:48:09.049Z" itemprop="dateUpdated">2019-08-04</time>
+    更新 <time datetime="2019-08-04T04:54:45.561Z" itemprop="dateUpdated">2019-08-04</time>
 
       </li>
       <li id="busuanzi_container_page_pv">
@@ -65,13 +65,11 @@
 <li>Kibana：数据分析和可视化平台。通常与 Elasticsearch 配合使用，对其中数据进行搜索、分析和以统计图表的方式展示；</li>
 <li>Filebeat：轻量级开源日志文件数据搜集器。在需要采集日志数据的 server 上安装 Filebeat，并指定日志目录或日志文件后，Filebeat 就能读取数据，迅速发送到 Logstash 进行解析，亦或直接发送到 Elasticsearch 进行集中式存储和分析。</li>
 </ul>
-<h2 id="常见架构模式"><a href="#常见架构模式" class="headerlink" title="常见架构模式"></a>常见架构模式</h2><h3 id="最简单的架构"><a href="#最简单的架构" class="headerlink" title="最简单的架构"></a>最简单的架构</h3><p><img src="/images/elk-simple.png" alt="elk-simple.png"></p>
-
-<p>在这种架构中，只有一个  <code>Logstash</code>、<code>Elasticsearch</code> 和 <code>Kibana</code>实例。<code>Logstash</code> 通过输入插件从多种数据源（比如日志文件、标准输入 <code>Stdin</code> 等）获取数据，再经过滤插件加工数据，然后经 <code>Elasticsearch</code> 输出插件输出到 <code>Elasticsearch</code>，通过 <code>Kibana</code>展示。这种架构适合初学者学习 <code>ELK</code> 的工作模式，搭建最简单的工作模式。</p>
-<h3 id="Logstash-作为日志搜索器"><a href="#Logstash-作为日志搜索器" class="headerlink" title="Logstash 作为日志搜索器"></a>Logstash 作为日志搜索器</h3><p><img src="/images/elk-logstash.png" alt="elk-logstash.png"><br>这种架构是对上面架构的扩展，把一个 <code>Logstash</code> 数据搜集节点扩展到多个，分布于多台机器，将解析好的数据发送到 <code>Elasticsearch server</code> 进行存储，最后在 <code>Kibana</code> 查询、生成日志报表等。</p>
+<h2 id="常见架构模式"><a href="#常见架构模式" class="headerlink" title="常见架构模式"></a>常见架构模式</h2><h3 id="最简单的架构"><a href="#最简单的架构" class="headerlink" title="最简单的架构"></a>最简单的架构</h3><p><img src="/xifengzhu_blog/images/elk-simple.png" alt="elk-simple.png"><br>在这种架构中，只有一个  <code>Logstash</code>、<code>Elasticsearch</code> 和 <code>Kibana</code>实例。<code>Logstash</code> 通过输入插件从多种数据源（比如日志文件、标准输入 <code>Stdin</code> 等）获取数据，再经过滤插件加工数据，然后经 <code>Elasticsearch</code> 输出插件输出到 <code>Elasticsearch</code>，通过 <code>Kibana</code>展示。这种架构适合初学者学习 <code>ELK</code> 的工作模式，搭建最简单的工作模式。</p>
+<h3 id="Logstash-作为日志搜索器"><a href="#Logstash-作为日志搜索器" class="headerlink" title="Logstash 作为日志搜索器"></a>Logstash 作为日志搜索器</h3><p><img src="/xifengzhu_blog/images/elk-logstash.png" alt="elk-logstash.png"><br>这种架构是对上面架构的扩展，把一个 <code>Logstash</code> 数据搜集节点扩展到多个，分布于多台机器，将解析好的数据发送到 <code>Elasticsearch server</code> 进行存储，最后在 <code>Kibana</code> 查询、生成日志报表等。</p>
 <p>这种架构在日常中应用的比较少；因为需要在各个服务器上部署 Logstash，而它比较消耗 CPU 和内存资源，所以比较适合计算资源丰富的服务器，否则容易造成服务器性能下降，甚至可能导致无法正常工作。</p>
-<h3 id="使用-filebeat-作为日志收集器"><a href="#使用-filebeat-作为日志收集器" class="headerlink" title="使用 filebeat 作为日志收集器"></a>使用 <code>filebeat</code> 作为日志收集器</h3><p><img src="/images/elk-filebeat.png" alt="elk-filebeat.png"><br>这种架构是对上面架构的优化，<code>filebeat</code>比 <code>logstash</code> 更轻量，占用资源更少，通过<code>filebeat</code>采集日志，经<code>logstash</code>处理之后传递给<code>Elasticsearch</code>，通过 <code>Kibana</code> 展示。</p>
-<h3 id="引入消息队列-将ES做成集群"><a href="#引入消息队列-将ES做成集群" class="headerlink" title="引入消息队列,将ES做成集群"></a>引入消息队列,将ES做成集群</h3><p><img src="/images/elk-cluster.png" alt="elk-cluster.png"><br>一些大型项目日志访问频繁，产生的日志文件比较多，对日志的分析要求较高，对稳定性与可靠性要求较高，可以在 <code>filebeat</code> 与 <code>logstash</code> 之间插入一层队列, 先将数据传递给消息队列，然后通过 <code>logstash</code> 拉取消息队列数据, 处理之后传递给ES集群处理。</p>
+<h3 id="使用-filebeat-作为日志收集器"><a href="#使用-filebeat-作为日志收集器" class="headerlink" title="使用 filebeat 作为日志收集器"></a>使用 <code>filebeat</code> 作为日志收集器</h3><p><img src="/xifengzhu_blog/images/elk-filebeat.png" alt="elk-filebeat.png"><br>这种架构是对上面架构的优化，<code>filebeat</code>比 <code>logstash</code> 更轻量，占用资源更少，通过<code>filebeat</code>采集日志，经<code>logstash</code>处理之后传递给<code>Elasticsearch</code>，通过 <code>Kibana</code> 展示。</p>
+<h3 id="引入消息队列-将ES做成集群"><a href="#引入消息队列-将ES做成集群" class="headerlink" title="引入消息队列,将ES做成集群"></a>引入消息队列,将ES做成集群</h3><p><img src="/xifengzhu_blog/images/elk-cluster.png" alt="elk-cluster.png"><br>一些大型项目日志访问频繁，产生的日志文件比较多，对日志的分析要求较高，对稳定性与可靠性要求较高，可以在 <code>filebeat</code> 与 <code>logstash</code> 之间插入一层队列, 先将数据传递给消息队列，然后通过 <code>logstash</code> 拉取消息队列数据, 处理之后传递给ES集群处理。</p>
 <h2 id="为Rails应用集群增加ELK"><a href="#为Rails应用集群增加ELK" class="headerlink" title="为Rails应用集群增加ELK"></a>为Rails应用集群增加ELK</h2><h3 id="为项目添加日志解析"><a href="#为项目添加日志解析" class="headerlink" title="为项目添加日志解析"></a>为项目添加日志解析</h3><ul>
 <li>添加日志解析的Gem</li>
 </ul>
